@@ -231,11 +231,14 @@ function colorFilter
             }
         }
 
-        foreach($exclude in $excludes)
+        if($excludes)
         {
-            if($pipe.ToLower().Contains($exclude.ToLower()))
+            foreach($exclude in $excludes)
             {
-                $output = $false
+                if($pipe.ToLower().Contains($exclude.ToLower()))
+                {
+                    $output = $false
+                }
             }
         }
 
