@@ -41,7 +41,7 @@
 
 Param(
         [Parameter(Mandatory=$true)][string]$FileName,
-        [Parameter(Mandatory=$true)][Alias("Filter")][string]$ColorFilter,
+        [Alias("Filter")][string]$ColorFilter,
         [string]$Exclude,
         [switch]$ShowAll,
         [switch]$HighlightErrorsAndWarnings,
@@ -190,28 +190,34 @@ function colorFilter
     [CmdletBinding()]
     Param(
         [Parameter(ValueFromPipeline)][string]$pipe,
-        [Parameter(Mandatory=$true)][string[]]$filter,
+        [string[]]$filter,
         [string[]]$excludes
     )
     process {
         $colorNbr = 0 #keep a hold of the colors we've already used
         $output = $false
         $originalPipe = $pipe #we'll be modifying the original string, but maybe the user wants to output it to another file so we're remembering it
-        foreach($f in $filter)
+        if($filter)
         {
-            if($pipe.toLower().contains($f.toLower())) #comparing toLower values -> case insensitive
+            foreach($f in $filter)
             {
-                $output = $true
-                $wordIndex = ($pipe | Select-String $f -AllMatches).Matches.Index #find all occurances of the string we're looking for
-                for($i=0;$i -lt $wordIndex.length;$i++)
+                if($pipe.toLower().contains($f.toLower())) #comparing toLower values -> case insensitive
                 {
-                    $colorMarker = "^c"+$colorMap[$colorNbr] #generate colormarker
+                    $output = $true
+                    $wordIndex = ($pipe | Select-String $f -AllMatches).Matches.Index #find all occurances of the string we're looking for
+                    for($i=0;$i -lt $wordIndex.length;$i++)
+                    {
+                        $colorMarker = "^c"+$colorMap[$colorNbr] #generate colormarker
 
-                    $pipe = $pipe.Insert($wordIndex[$i]+(2*3*$i),$colorMarker) #take in concideration we already added a few times 3 characters twice characters!
-                    $pipe = $pipe.Insert($wordIndex[$i]+(2*3*$i)+$f.length+3,"^cn")
-                }
-            }       
-            $colorNbr++
+                        $pipe = $pipe.Insert($wordIndex[$i]+(2*3*$i),$colorMarker) #take in concideration we already added a few times 3 characters twice characters!
+                        $pipe = $pipe.Insert($wordIndex[$i]+(2*3*$i)+$f.length+3,"^cn")
+                    }
+                }       
+                $colorNbr++
+            }
+        }
+        else {
+            $output = $true
         }
         if($HighlightErrorsAndWarnings) #if user asks for it, we'll highlight the error and warning lines. Processing after initial coloring -> initial trigger kept
         {
