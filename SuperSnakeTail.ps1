@@ -35,10 +35,6 @@
   Will search the log "test.txt" for words "cool" and "awesome" and display lines of the log with these words highlighted and save the filtered log to "out.txt"
 #>
 
-<#todo:
-    -default logfile
-#>
-
 Param(
         [Parameter(Mandatory=$true)][string]$FileName,
         [Alias("Filter")][string]$ColorFilter,
@@ -125,7 +121,7 @@ Function Write-Color
     $count = 1
  
     ### Loop through the array
-    $strArray | % {
+    $strArray | ForEach-Object {
         if ($count -eq 1 -and $blnStartsWithColor -eq $false)
         {
             Write-Host $_ -NoNewline
