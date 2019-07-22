@@ -268,7 +268,7 @@ if($filterSplit.Length -gt $colorMap.Length) #limit amount of filters: we might 
 {
     if(Test-Path $FileName) #check if file exists
     {
-        Get-Content $fileName -Wait | colorFilter -filter $filterSplit -excludes $excludeSplit #send input to filter
+        Get-Content $fileName -Wait -Tail 10 | colorFilter -filter $filterSplit -excludes $excludeSplit #send input to filter
     } else
     {
         Write-Host "File not found"
